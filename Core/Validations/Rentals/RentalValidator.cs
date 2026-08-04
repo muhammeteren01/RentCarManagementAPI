@@ -42,9 +42,6 @@ public class RentalValidator : AbstractValidator<Rental>
         RuleFor(x => x.ExtraKmCharge)
             .GreaterThanOrEqualTo(0).WithMessage("Extra km charge cannot be negative.");
 
-        RuleFor(x => x.DamageFee)
-            .GreaterThanOrEqualTo(0).WithMessage("Damage fee cannot be negative.");
-
         RuleFor(x => x.Status)
             .IsInEnum().WithMessage("Status is not valid.");
     }

@@ -16,7 +16,6 @@ public class RentalService : GenericService<Rental>, IRentalService
 {
     private readonly IRentalRepository _rentalRepository;
     private readonly ICarRepository _carRepository;
-    private readonly IDamageReportRepository _damageReportRepository;
     private readonly IPricingService _pricingService;
     private readonly IMapper _mapper;
     private readonly IValidator<CreateRentalRequest> _createValidator;
@@ -27,7 +26,6 @@ public class RentalService : GenericService<Rental>, IRentalService
         IRentalRepository repository,
         IUnitOfWork unitOfWork,
         ICarRepository carRepository,
-        IDamageReportRepository damageReportRepository,
         IPricingService pricingService,
         IMapper mapper,
         IValidator<CreateRentalRequest> createValidator,
@@ -37,7 +35,6 @@ public class RentalService : GenericService<Rental>, IRentalService
     {
         _rentalRepository = repository;
         _carRepository = carRepository;
-        _damageReportRepository = damageReportRepository;
         _pricingService = pricingService;
         _mapper = mapper;
         _createValidator = createValidator;
@@ -75,7 +72,6 @@ public class RentalService : GenericService<Rental>, IRentalService
             BasePrice = basePrice,
             LateFee = 0,
             ExtraKmCharge = 0,
-            DamageFee = 0,
             Status = RentalStatus.Active
         };
 
@@ -173,17 +169,6 @@ public class RentalService : GenericService<Rental>, IRentalService
         car.CurrentMileage = request.EndMileage;
         car.Status = CarStatus.Available;
 
-        var unpaidReports = await _damageReportRepository.FindAsync(r =>
-            r.RentalId == rental.Id && r.PaymentStatus == DamagePaymentStatus.Unpaid);
-
-        var paidAt = actualReturnDate;
-        foreach (var report in unpaidReports)
-        {
-            report.PaymentStatus = DamagePaymentStatus.Paid;
-            report.PaidDate = paidAt;
-            _damageReportRepository.Update(report);
-        }
-
         _rentalRepository.Update(rental);
         _carRepository.Update(car);
         await UnitOfWork.SaveChangesAsync();
@@ -243,7 +228,7 @@ public class RentalService : GenericService<Rental>, IRentalService
         var response = _mapper.Map<RentalResponse>(rental);
         response.RentalDays = rentalDays;
         response.IncludedKm = includedKm;
-        response.TotalPrice = rental.BasePrice + rental.LateFee + rental.ExtraKmCharge + rental.DamageFee;
+        response.TotalPrice = rental.BasePrice + rental.LateFee + rental.ExtraKmCharge;
         response.CarBrand = car?.Brand;
         response.CarModel = car?.Model;
         return response;

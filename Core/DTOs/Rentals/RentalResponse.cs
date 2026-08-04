@@ -19,7 +19,6 @@ public class RentalResponse
     public decimal BasePrice { get; set; }
     public decimal LateFee { get; set; }
     public decimal ExtraKmCharge { get; set; }
-    public decimal DamageFee { get; set; }
     public decimal TotalPrice { get; set; }
     public RentalStatus Status { get; set; }
 }
