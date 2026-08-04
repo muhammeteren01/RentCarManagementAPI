@@ -14,5 +14,9 @@ public class ChangePasswordRequestValidator : AbstractValidator<ChangePasswordRe
             .NotEmpty().WithMessage("New password is required.")
             .MinimumLength(6).WithMessage("New password must be at least 6 characters.")
             .NotEqual(x => x.CurrentPassword).WithMessage("New password must be different from current password.");
+
+        RuleFor(x => x.ConfirmPassword)
+            .NotEmpty().WithMessage("Confirm password is required.")
+            .Equal(x => x.NewPassword).WithMessage("New password and confirm password must match.");
     }
 }
