@@ -6,11 +6,11 @@ using Core.Exceptions;
 using Core.Repositories;
 using Core.Services;
 using Core.UnitOfWork;
-using Service.Common;
+using Service.Services.Common;
 using FluentValidation;
 using ValidationException = Core.Validations.ValidationException;
 
-namespace Service.Rentals;
+namespace Service.Services.Rentals;
 
 public class RentalService : GenericService<Rental>, IRentalService
 {

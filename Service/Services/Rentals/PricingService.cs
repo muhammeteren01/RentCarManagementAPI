@@ -1,7 +1,7 @@
 using Core.Services;
 using Core.Settings;
 
-namespace Service.Rentals;
+namespace Service.Services.Rentals;
 
 public class PricingService : IPricingService
 {

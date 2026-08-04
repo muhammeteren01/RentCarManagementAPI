@@ -2,9 +2,9 @@ using Core.Entities;
 using Core.Repositories;
 using Core.Services;
 using Core.UnitOfWork;
-using Service.Common;
+using Service.Services.Common;
 
-namespace Service.DamageReports;
+namespace Service.Services.DamageReports;
 
 public class DamageReportService : GenericService<DamageReport>, IDamageReportService
 {
