@@ -1,12 +1,12 @@
 using Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Service.Auth;
-using Service.Cars;
-using Service.DamageReports;
 using Service.Mapping;
-using Service.Rentals;
-using Service.Users;
+using Service.Services.Auth;
+using Service.Services.Cars;
+using Service.Services.DamageReports;
+using Service.Services.Rentals;
+using Service.Services.Users;
 
 namespace Service;
 

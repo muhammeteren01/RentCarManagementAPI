@@ -1,8 +1,8 @@
 using Core.Enums;
 
-namespace Core.Entities;
+namespace Core.DTOs.DamageReports;
 
-public class DamageReport
+public class DamageReportResponse
 {
     public Guid Id { get; set; }
     public Guid RentalId { get; set; }
@@ -11,6 +11,4 @@ public class DamageReport
     public DamagePaymentStatus PaymentStatus { get; set; }
     public DateTime ReportedDate { get; set; }
     public DateTime? PaidDate { get; set; }
-
-    public Rental Rental { get; set; } = null!;
 }

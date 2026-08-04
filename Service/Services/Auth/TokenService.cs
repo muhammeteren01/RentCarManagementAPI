@@ -7,7 +7,7 @@ using Core.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Service.Auth;
+namespace Service.Services.Auth;
 
 public class TokenService : ITokenService
 {

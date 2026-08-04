@@ -3,7 +3,7 @@ using Core.Repositories;
 using Core.Services;
 using Core.UnitOfWork;
 
-namespace Service.Common;
+namespace Service.Services.Common;
 
 public class GenericService<T> : IGenericService<T> where T : class
 {

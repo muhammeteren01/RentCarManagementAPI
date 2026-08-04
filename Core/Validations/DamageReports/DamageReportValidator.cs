@@ -1,4 +1,5 @@
 using Core.Entities;
+using Core.Enums;
 using FluentValidation;
 
 namespace Core.Validations.DamageReports;
@@ -20,14 +21,22 @@ public class DamageReportValidator : AbstractValidator<DamageReport>
         RuleFor(x => x.ReportedDate)
             .NotEmpty().WithMessage("Reported date is required.");
 
+        RuleFor(x => x.PaymentStatus)
+            .IsInEnum().WithMessage("Payment status is invalid.");
+
         RuleFor(x => x.PaidDate)
             .GreaterThanOrEqualTo(x => x.ReportedDate)
-            .When(x => x.IsPaid && x.PaidDate.HasValue)
+            .When(x => x.PaymentStatus == DamagePaymentStatus.Paid && x.PaidDate.HasValue)
             .WithMessage("Paid date cannot be before reported date.");
 
         RuleFor(x => x.PaidDate)
             .NotNull()
-            .When(x => x.IsPaid)
+            .When(x => x.PaymentStatus == DamagePaymentStatus.Paid)
             .WithMessage("Paid date is required when damage is marked as paid.");
+
+        RuleFor(x => x.PaidDate)
+            .Null()
+            .When(x => x.PaymentStatus == DamagePaymentStatus.Unpaid)
+            .WithMessage("Paid date must be empty when damage is unpaid.");
     }
 }

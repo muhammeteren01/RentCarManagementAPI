@@ -23,6 +23,7 @@ public class RentalConfiguration : IEntityTypeConfiguration<Rental>
         builder.Property(x => x.BasePrice).HasColumnName("base_price").HasColumnType("decimal(18,2)").IsRequired();
         builder.Property(x => x.LateFee).HasColumnName("late_fee").HasColumnType("decimal(18,2)").IsRequired();
         builder.Property(x => x.ExtraKmCharge).HasColumnName("extra_km_charge").HasColumnType("decimal(18,2)").IsRequired();
+        builder.Property(x => x.DamageFee).HasColumnName("damage_fee").HasColumnType("decimal(18,2)").IsRequired();
         builder.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(50).IsRequired();
 
         builder.HasMany(x => x.DamageReports)
