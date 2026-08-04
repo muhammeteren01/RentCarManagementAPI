@@ -60,6 +60,14 @@ public class RentalsController : ControllerBase
         return Ok(rental);
     }
 
+    [HttpPost("{id:guid}/cancel")]
+    public async Task<ActionResult<RentalResponse>> Cancel(Guid id)
+    {
+        var (userId, role) = GetCurrentUser();
+        var rental = await _rentalService.CancelAsync(id, userId, role);
+        return Ok(rental);
+    }
+
     private (Guid UserId, UserRole Role) GetCurrentUser()
     {
         var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
