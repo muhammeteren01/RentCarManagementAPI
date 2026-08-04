@@ -6,7 +6,8 @@ using Serilog;
 using Service;
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("Logs/bootstrap-.txt", rollingInterval: RollingInterval.Day)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
     .CreateBootstrapLogger();
 
 try
@@ -19,7 +20,7 @@ try
             .Enrich.FromLogContext());
 
     builder.Services.AddControllers();
-    builder.Services.AddOpenApi();
+    builder.Services.AddSwaggerDocumentation();
     builder.Services.AddRepository(builder.Configuration);
     builder.Services.AddApplicationServices(builder.Configuration);
     builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -27,12 +28,19 @@ try
 
     var app = builder.Build();
 
+    // Outer → Inner: request log must see final status after exception handling
+    app.UseCorrelationId();
+    app.UseRequestLogging();
     app.UseExceptionMiddleware();
-    app.UseSerilogRequestLogging();
 
     if (app.Environment.IsDevelopment())
     {
-        app.MapOpenApi();
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "Rent Car Management API v1");
+            options.RoutePrefix = "swagger";
+        });
     }
 
     app.UseHttpsRedirection();
@@ -40,7 +48,7 @@ try
     app.UseAuthorization();
     app.MapControllers();
 
-    Log.Information("Application starting");
+    Log.Information("Application starting. Environment={Environment}", app.Environment.EnvironmentName);
     app.Run();
 }
 catch (Exception ex)
