@@ -16,7 +16,7 @@ public class DamageReportConfiguration : IEntityTypeConfiguration<DamageReport>
         builder.Property(x => x.RentalId).HasColumnName("rental_id").IsRequired();
         builder.Property(x => x.Description).HasColumnName("description").HasColumnType("nvarchar(max)").IsRequired();
         builder.Property(x => x.DamageCost).HasColumnName("damage_cost").HasColumnType("decimal(18,2)").IsRequired();
-        builder.Property(x => x.IsPaid).HasColumnName("is_paid").IsRequired();
+        builder.Property(x => x.PaymentStatus).HasColumnName("payment_status").HasConversion<string>().HasMaxLength(50).IsRequired();
         builder.Property(x => x.ReportedDate).HasColumnName("reported_date").IsRequired();
         builder.Property(x => x.PaidDate).HasColumnName("paid_date");
     }

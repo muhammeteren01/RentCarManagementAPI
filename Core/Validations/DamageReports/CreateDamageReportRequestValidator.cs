@@ -13,5 +13,8 @@ public class CreateDamageReportRequestValidator : AbstractValidator<CreateDamage
         RuleFor(x => x.Description)
             .NotEmpty().WithMessage("Description is required.")
             .MaximumLength(2000).WithMessage("Description must not exceed 2000 characters.");
+
+        RuleFor(x => x.DamageCost)
+            .GreaterThanOrEqualTo(0).WithMessage("Damage cost cannot be negative.");
     }
 }

@@ -52,9 +52,9 @@ public class DamageReportService : GenericService<DamageReport>, IDamageReportSe
             throw new UnauthorizedException("You are not allowed to create a damage report for this rental.");
         }
 
-        if (rental.Status == RentalStatus.Cancelled)
+        if (rental.Status is not (RentalStatus.Active or RentalStatus.Extended))
         {
-            throw new ConflictException("Cannot create a damage report for a cancelled rental.");
+            throw new ConflictException("Damage reports can only be created for active or extended rentals.");
         }
 
         var report = new DamageReport
@@ -62,13 +62,16 @@ public class DamageReportService : GenericService<DamageReport>, IDamageReportSe
             Id = Guid.NewGuid(),
             RentalId = rental.Id,
             Description = request.Description.Trim(),
-            DamageCost = 0,
-            IsPaid = false,
+            DamageCost = request.DamageCost,
+            PaymentStatus = DamagePaymentStatus.Unpaid,
             ReportedDate = DateTime.UtcNow,
             PaidDate = null
         };
 
+        rental.DamageFee += request.DamageCost;
+
         await _damageReportRepository.AddAsync(report);
+        _rentalRepository.Update(rental);
         await UnitOfWork.SaveChangesAsync();
 
         return _mapper.Map<DamageReportResponse>(report);
