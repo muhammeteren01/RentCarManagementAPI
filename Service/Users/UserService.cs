@@ -5,10 +5,11 @@ using Core.Exceptions;
 using Core.Repositories;
 using Core.Services;
 using Core.UnitOfWork;
+using Service.Common;
 using FluentValidation;
 using ValidationException = Core.Validations.ValidationException;
 
-namespace Service.Services;
+namespace Service.Users;
 
 public class UserService : GenericService<User>, IUserService
 {

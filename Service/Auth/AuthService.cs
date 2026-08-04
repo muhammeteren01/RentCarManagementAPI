@@ -8,7 +8,7 @@ using Core.UnitOfWork;
 using FluentValidation;
 using ValidationException = Core.Validations.ValidationException;
 
-namespace Service.Services;
+namespace Service.Auth;
 
 public class AuthService : IAuthService
 {
