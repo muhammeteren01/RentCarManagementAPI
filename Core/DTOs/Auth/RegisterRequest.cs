@@ -1,3 +1,5 @@
+using Core.Enums;
+
 namespace Core.DTOs.Auth;
 
 public class RegisterRequest
@@ -7,4 +9,5 @@ public class RegisterRequest
     public string Email { get; set; } = null!;
     public string Password { get; set; } = null!;
     public string LicenseNumber { get; set; } = null!;
+    public UserRole Role { get; set; } = UserRole.Customer;
 }

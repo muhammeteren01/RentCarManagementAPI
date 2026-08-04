@@ -1,4 +1,5 @@
 using Core.DTOs.Auth;
+using Core.Enums;
 using FluentValidation;
 
 namespace Core.Validations.Auth;
@@ -27,5 +28,8 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         RuleFor(x => x.LicenseNumber)
             .NotEmpty().WithMessage("License number is required.")
             .MaximumLength(50).WithMessage("License number must not exceed 50 characters.");
+
+        RuleFor(x => x.Role)
+            .IsInEnum().WithMessage("Role is not valid.");
     }
 }

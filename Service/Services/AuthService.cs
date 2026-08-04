@@ -1,7 +1,6 @@
 using AutoMapper;
 using Core.DTOs.Auth;
 using Core.Entities;
-using Core.Enums;
 using Core.Exceptions;
 using Core.Repositories;
 using Core.Services;
@@ -55,7 +54,7 @@ public class AuthService : IAuthService
         var user = _mapper.Map<User>(request);
         user.Id = Guid.NewGuid();
         user.PasswordHash = _passwordService.HashPassword(request.Password);
-        user.Role = UserRole.Customer;
+        user.Role = request.Role;
         user.CreatedAt = DateTime.UtcNow;
 
         await _userRepository.AddAsync(user);

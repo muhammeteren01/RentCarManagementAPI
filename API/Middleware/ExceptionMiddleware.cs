@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using System.Text.Json;
 using Core.Exceptions;
 using ValidationException = Core.Validations.ValidationException;
@@ -49,6 +50,11 @@ public class ExceptionMiddleware
                 conflictException.Message,
                 null),
 
+            NotFoundException notFoundException => (
+                (int)HttpStatusCode.NotFound,
+                notFoundException.Message,
+                null),
+
             KeyNotFoundException keyNotFoundException => (
                 (int)HttpStatusCode.NotFound,
                 keyNotFoundException.Message,
@@ -60,13 +66,44 @@ public class ExceptionMiddleware
                 null)
         };
 
+        var correlationId = context.Items[CorrelationIdMiddleware.HeaderName]?.ToString()
+            ?? context.TraceIdentifier;
+        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         if (statusCode >= 500)
         {
-            _logger.LogError(exception, "Unhandled exception");
+            _logger.LogError(
+                exception,
+                "Unhandled exception. CorrelationId={CorrelationId} UserId={UserId} Path={Path}",
+                correlationId,
+                userId,
+                context.Request.Path);
+        }
+        else if (errors is not null)
+        {
+            _logger.LogWarning(
+                "Handled business exception. StatusCode={StatusCode} Message={Message} Errors={@Errors} CorrelationId={CorrelationId} UserId={UserId} Path={Path}",
+                statusCode,
+                message,
+                errors,
+                correlationId,
+                userId,
+                context.Request.Path);
         }
         else
         {
-            _logger.LogWarning(exception, "Handled exception: {Message}", message);
+            _logger.LogWarning(
+                "Handled business exception. StatusCode={StatusCode} Message={Message} CorrelationId={CorrelationId} UserId={UserId} Path={Path}",
+                statusCode,
+                message,
+                correlationId,
+                userId,
+                context.Request.Path);
+        }
+
+        if (context.Response.HasStarted)
+        {
+            return;
         }
 
         context.Response.ContentType = "application/json";
@@ -76,7 +113,8 @@ public class ExceptionMiddleware
         {
             statusCode,
             message,
-            errors
+            errors,
+            correlationId
         };
 
         var options = new JsonSerializerOptions
