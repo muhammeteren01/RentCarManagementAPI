@@ -13,23 +13,28 @@ namespace Service.Services;
 
 public class CarService : GenericService<Car>, ICarService
 {
+    private const int DefaultMaintenanceIntervalKm = 10000;
+
     private readonly ICarRepository _carRepository;
     private readonly IMapper _mapper;
     private readonly IValidator<CreateCarRequest> _createValidator;
     private readonly IValidator<UpdateCarRequest> _updateValidator;
+    private readonly IValidator<CompleteMaintenanceRequest> _completeMaintenanceValidator;
 
     public CarService(
         ICarRepository repository,
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IValidator<CreateCarRequest> createValidator,
-        IValidator<UpdateCarRequest> updateValidator)
+        IValidator<UpdateCarRequest> updateValidator,
+        IValidator<CompleteMaintenanceRequest> completeMaintenanceValidator)
         : base(repository, unitOfWork)
     {
         _carRepository = repository;
         _mapper = mapper;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
+        _completeMaintenanceValidator = completeMaintenanceValidator;
     }
 
     public async Task<IEnumerable<CarResponse>> GetCarsAsync(UserRole role)
@@ -97,5 +102,68 @@ public class CarService : GenericService<Car>, ICarService
 
         _carRepository.Remove(car);
         await UnitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<CarResponse>> GetMaintenanceDueCarsAsync()
+    {
+        var cars = await _carRepository.FindAsync(c =>
+            c.CurrentMileage >= c.MaintenanceThresholdKm &&
+            c.Status != CarStatus.Maintenance);
+
+        return _mapper.Map<IEnumerable<CarResponse>>(cars);
+    }
+
+    public async Task<CarResponse> SendToMaintenanceAsync(Guid id)
+    {
+        var car = await _carRepository.GetByIdAsync(id)
+            ?? throw new NotFoundException($"Car with id '{id}' was not found.");
+
+        if (car.Status == CarStatus.Rented)
+        {
+            throw new ConflictException("Cannot send a rented car to maintenance.");
+        }
+
+        if (car.Status == CarStatus.Maintenance)
+        {
+            throw new ConflictException("Car is already in maintenance.");
+        }
+
+        car.Status = CarStatus.Maintenance;
+        _carRepository.Update(car);
+        await UnitOfWork.SaveChangesAsync();
+
+        return _mapper.Map<CarResponse>(car);
+    }
+
+    public async Task<CarResponse> CompleteMaintenanceAsync(Guid id, CompleteMaintenanceRequest request)
+    {
+        var validationResult = await _completeMaintenanceValidator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+
+        var car = await _carRepository.GetByIdAsync(id)
+            ?? throw new NotFoundException($"Car with id '{id}' was not found.");
+
+        if (car.Status != CarStatus.Maintenance)
+        {
+            throw new ConflictException("Only cars in maintenance can complete maintenance.");
+        }
+
+        var nextThreshold = request.NextMaintenanceThresholdKm
+            ?? car.CurrentMileage + DefaultMaintenanceIntervalKm;
+
+        if (nextThreshold <= car.CurrentMileage)
+        {
+            throw new ConflictException("Next maintenance threshold must be greater than current mileage.");
+        }
+
+        car.MaintenanceThresholdKm = nextThreshold;
+        car.Status = CarStatus.Available;
+        _carRepository.Update(car);
+        await UnitOfWork.SaveChangesAsync();
+
+        return _mapper.Map<CarResponse>(car);
     }
 }

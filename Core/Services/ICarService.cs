@@ -11,4 +11,8 @@ public interface ICarService : IGenericService<Car>
     Task<CarResponse> CreateAsync(CreateCarRequest request);
     Task<CarResponse> UpdateAsync(Guid id, UpdateCarRequest request);
     Task DeleteAsync(Guid id);
+
+    Task<IEnumerable<CarResponse>> GetMaintenanceDueCarsAsync();
+    Task<CarResponse> SendToMaintenanceAsync(Guid id);
+    Task<CarResponse> CompleteMaintenanceAsync(Guid id, CompleteMaintenanceRequest request);
 }
