@@ -176,6 +176,33 @@ public class RentalService : GenericService<Rental>, IRentalService
         return MapToResponse(rental, car);
     }
 
+    public async Task<RentalResponse> CancelAsync(Guid rentalId, Guid requesterId, UserRole role)
+    {
+        var rental = await GetAccessibleRentalAsync(rentalId, requesterId, role);
+
+        if (rental.Status == RentalStatus.Completed)
+        {
+            throw new ConflictException("Completed rentals cannot be cancelled.");
+        }
+
+        if (rental.Status == RentalStatus.Cancelled)
+        {
+            throw new ConflictException("Rental is already cancelled.");
+        }
+
+        var car = await _carRepository.GetByIdAsync(rental.CarId)
+            ?? throw new NotFoundException($"Car with id '{rental.CarId}' was not found.");
+
+        rental.Status = RentalStatus.Cancelled;
+        car.Status = CarStatus.Available;
+
+        _rentalRepository.Update(rental);
+        _carRepository.Update(car);
+        await UnitOfWork.SaveChangesAsync();
+
+        return MapToResponse(rental, car);
+    }
+
     public async Task<RentalResponse> GetByIdAsync(Guid rentalId, Guid requesterId, UserRole role)
     {
         var rental = await GetAccessibleRentalAsync(rentalId, requesterId, role);
