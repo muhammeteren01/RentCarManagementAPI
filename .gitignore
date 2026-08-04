@@ -1,0 +1,37 @@
+## .NET
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.DotSettings.user
+
+## Build
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Secrets / local config
+appsettings.*.local.json
+*.pfx
+*.key
+.env
+.env.*
+
+## OS / IDE
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+*.rsuser
