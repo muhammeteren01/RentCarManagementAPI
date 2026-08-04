@@ -28,6 +28,14 @@ public class DamageReportsController : ControllerBase
         return Created($"/api/DamageReports/{report.Id}", report);
     }
 
+    [HttpPost("{id:guid}/collect-payment")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
+    public async Task<ActionResult<DamageReportResponse>> CollectPayment(Guid id)
+    {
+        var report = await _damageReportService.CollectPaymentAsync(id);
+        return Ok(report);
+    }
+
     private (Guid UserId, UserRole Role) GetCurrentUser()
     {
         var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);

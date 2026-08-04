@@ -68,10 +68,26 @@ public class DamageReportService : GenericService<DamageReport>, IDamageReportSe
             PaidDate = null
         };
 
-        rental.DamageFee += request.DamageCost;
-
         await _damageReportRepository.AddAsync(report);
-        _rentalRepository.Update(rental);
+        await UnitOfWork.SaveChangesAsync();
+
+        return _mapper.Map<DamageReportResponse>(report);
+    }
+
+    public async Task<DamageReportResponse> CollectPaymentAsync(Guid damageReportId)
+    {
+        var report = await _damageReportRepository.GetByIdAsync(damageReportId)
+            ?? throw new NotFoundException($"Damage report with id '{damageReportId}' was not found.");
+
+        if (report.PaymentStatus == DamagePaymentStatus.Paid)
+        {
+            throw new ConflictException("Damage report payment has already been collected.");
+        }
+
+        report.PaymentStatus = DamagePaymentStatus.Paid;
+        report.PaidDate = DateTime.UtcNow;
+
+        _damageReportRepository.Update(report);
         await UnitOfWork.SaveChangesAsync();
 
         return _mapper.Map<DamageReportResponse>(report);
