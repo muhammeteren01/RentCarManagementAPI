@@ -1,6 +1,6 @@
 using Core.Services;
 
-namespace Service.Services;
+namespace Service.Auth;
 
 public class PasswordService : IPasswordService
 {
