@@ -1,6 +1,7 @@
 using AutoMapper;
 using Core.DTOs.Auth;
 using Core.DTOs.Cars;
+using Core.DTOs.DamageReports;
 using Core.DTOs.Rentals;
 using Core.DTOs.Users;
 using Core.Entities;
@@ -45,5 +46,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.RentalDays, opt => opt.Ignore())
             .ForMember(dest => dest.IncludedKm, opt => opt.Ignore())
             .ForMember(dest => dest.TotalPrice, opt => opt.Ignore());
+
+        CreateMap<DamageReport, DamageReportResponse>();
     }
 }
