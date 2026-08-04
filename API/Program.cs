@@ -15,6 +15,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 
 var app = builder.Build();
 
+app.UseExceptionMiddleware();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
