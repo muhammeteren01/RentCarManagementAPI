@@ -2,5 +2,6 @@
   <Project Path="API/API.csproj" />
   <Project Path="Core/Core.csproj" Id="76596cf9-5061-46e8-a44b-b721667f5f18" />
   <Project Path="Repository/Repository.csproj" Id="0fe9f699-294e-4aab-be9e-4b9007c1bdc2" />
+  <Project Path="Service.Tests/Service.Tests.csproj" />
   <Project Path="Service/Service.csproj" Id="bd635db2-618d-4446-9d8f-f9144f6afcf7" />
 </Solution>
